@@ -58,7 +58,7 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
   const isEditing = !!developer;
 
   const form = useForm<DeveloperFormValues>({
-    resolver: zodResolver(developerSchema),
+    resolver: zodResolver(developerSchema) as any,
     defaultValues: {
       name: "",
       email: "",
@@ -98,8 +98,18 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
         toast.success("Developer created successfully");
       }
       onOpenChange(false);
-    } catch {
-      toast.error("An error occurred. Please try again.");
+    } catch (error: any) {
+      if (error?.isValidationError && error.errors) {
+        // Map backend validation errors to the form fields
+        Object.entries(error.errors).forEach(([field, messages]) => {
+          if (Array.isArray(messages) && messages.length > 0) {
+            form.setError(field as any, { type: "server", message: messages[0] });
+          }
+        });
+        toast.error("Please fix the validation errors.");
+      } else {
+        toast.error("An error occurred. Please try again.");
+      }
     }
   };
 
@@ -118,9 +128,9 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
         </DialogHeader>
 
         <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-4">
+          <form onSubmit={form.handleSubmit(onSubmit as any)} className="space-y-4">
             <FormField
-              control={form.control}
+              control={form.control as any}
               name="name"
               render={({ field }) => (
                 <FormItem>
@@ -135,7 +145,7 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="email"
                 render={({ field }) => (
                   <FormItem>
@@ -149,7 +159,7 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
               />
 
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="phone_number"
                 render={({ field }) => (
                   <FormItem>
@@ -165,7 +175,7 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
 
             <div className="grid grid-cols-2 gap-4">
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="website"
                 render={({ field }) => (
                   <FormItem>
@@ -179,7 +189,7 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
               />
 
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="status"
                 render={({ field }) => (
                   <FormItem>
@@ -202,16 +212,16 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
             </div>
 
             <FormField
-              control={form.control}
+              control={form.control as any}
               name="description"
               render={({ field }) => (
                 <FormItem>
                   <FormLabel>Description</FormLabel>
                   <FormControl>
-                    <Textarea 
-                      placeholder="Brief description about the developer..." 
+                    <Textarea
+                      placeholder="Brief description about the developer..."
                       className="min-h-[100px]"
-                      {...field} 
+                      {...field}
                     />
                   </FormControl>
                   <FormMessage />
@@ -221,20 +231,22 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
 
             <div className="grid grid-cols-2 gap-4 items-end">
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="logo"
                 render={({ field: { value, onChange, ...field } }) => (
                   <FormItem>
                     <FormLabel>Logo Image</FormLabel>
                     <FormControl>
-                      <Input 
-                        type="file" 
+                      <Input
+                        type="file"
                         accept="image/jpeg,image/png,image/svg+xml"
                         onChange={(e) => {
                           const file = e.target.files?.[0];
                           if (file) onChange(file);
                         }}
-                        {...field} 
+                        name={field.name}
+                        onBlur={field.onBlur}
+                        ref={field.ref}
                       />
                     </FormControl>
                     <FormMessage />
@@ -243,13 +255,13 @@ export function DeveloperFormDialog({ open, onOpenChange, developer }: Developer
               />
 
               <FormField
-                control={form.control}
+                control={form.control as any}
                 name="is_top"
                 render={({ field }) => (
                   <FormItem className="flex flex-row items-center space-x-3 space-y-0 rounded-md border p-4 shadow-sm">
                     <FormControl>
-                      <input 
-                        type="checkbox" 
+                      <input
+                        type="checkbox"
                         className="h-4 w-4 rounded border-gray-300"
                         checked={field.value}
                         onChange={field.onChange}

@@ -1,5 +1,5 @@
-
-import { Edit2, Trash2 } from "lucide-react";
+import Link from "next/link";
+import { Edit2, Trash2, Eye } from "lucide-react";
 import {
   Table,
   TableBody,
@@ -8,7 +8,8 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { Button } from "@/components/ui/button";
+import { Button, buttonVariants } from "@/components/ui/button";
+import { cn } from "@/lib/utils";
 import { Developer } from "@/types/developer";
 
 interface DevelopersTableProps {
@@ -19,11 +20,11 @@ interface DevelopersTableProps {
 
 export function DevelopersTable({ developers, onEdit, onDelete }: DevelopersTableProps) {
   return (
-    <div className="rounded-md border bg-card overflow-hidden">
+    <div className="rounded-xl border bg-white/50 backdrop-blur-sm shadow-[0_8px_30px_rgb(0,0,0,0.04)] overflow-hidden">
       <div className="overflow-x-auto">
         <Table>
-          <TableHeader className="bg-muted/50">
-            <TableRow>
+          <TableHeader className="bg-gray-50/80 border-b border-gray-100">
+            <TableRow className="hover:bg-transparent">
               <TableHead>Developer</TableHead>
               <TableHead>Email</TableHead>
               <TableHead>Phone</TableHead>
@@ -33,13 +34,18 @@ export function DevelopersTable({ developers, onEdit, onDelete }: DevelopersTabl
           </TableHeader>
           <TableBody>
             {developers.map((dev, index) => (
-              <TableRow key={dev.id || `dev-${index}`} className="group transition-colors hover:bg-muted/50">
-                <TableCell>
-                  <div className="flex items-center gap-3">
-                    <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-primary/10 text-primary font-semibold">
+              <TableRow key={dev.id || `dev-${index}`} className="group transition-all duration-300 hover:bg-white hover:shadow-sm hover:-translate-y-[1px] border-b border-gray-50/50">
+                <TableCell className="py-4">
+                  <div className="flex items-center gap-4">
+                    <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-[#0F7A6C]/10 to-[#0F7A6C]/5 text-[#0F7A6C] font-bold text-lg shadow-inner ring-1 ring-white/50">
                       {String(dev.name || "?").charAt(0).toUpperCase()}
                     </div>
-                    <div className="font-medium">{dev.name || "Unknown"}</div>
+                    <Link 
+                      href={`/dashboard/developers/${dev.id}`}
+                      className="font-semibold text-gray-800 transition-all cursor-pointer px-2 py-1 -ml-2 rounded-md hover:bg-[#0F7A6C]/10 hover:text-[#0F7A6C]"
+                    >
+                      {dev.name || "Unknown"}
+                    </Link>
                   </div>
                 </TableCell>
                 <TableCell>
@@ -49,21 +55,31 @@ export function DevelopersTable({ developers, onEdit, onDelete }: DevelopersTabl
                   <div className="text-sm text-gray-600">{dev.phone_number || "N/A"}</div>
                 </TableCell>
                 <TableCell>
-                  <span className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-semibold border ${
+                  <span className={`inline-flex items-center justify-center rounded-lg px-3 py-1 text-xs font-bold border transition-colors ${
                     dev.status === "active" 
-                      ? "bg-green-50 text-green-700 border-green-200" 
-                      : "bg-gray-50 text-gray-700 border-gray-200"
+                      ? "bg-emerald-50 text-emerald-600 border-emerald-100 shadow-[0_2px_10px_rgb(16,185,129,0.1)]" 
+                      : "bg-slate-50 text-slate-600 border-slate-200"
                   }`}>
                     {dev.status || "Unknown"}
                   </span>
                 </TableCell>
                 <TableCell className="text-right">
                   <div className="flex justify-end gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+                    <Link 
+                      href={`/dashboard/developers/${dev.id}`}
+                      className={cn(
+                        buttonVariants({ variant: "ghost", size: "icon" }),
+                        "h-8 w-8 text-emerald-600 hover:bg-emerald-50 hover:text-emerald-700"
+                      )}
+                    >
+                      <Eye className="h-4 w-4" />
+                      <span className="sr-only">View</span>
+                    </Link>
                     <Button
                       variant="ghost"
                       size="icon"
                       onClick={() => onEdit(dev)}
-                      className="h-8 w-8 text-blue-600 hover:bg-blue-50 hover:text-blue-700"
+                      className="h-9 w-9 text-blue-600 hover:bg-blue-50 hover:text-blue-700 rounded-lg shadow-sm border border-transparent hover:border-blue-100"
                     >
                       <Edit2 className="h-4 w-4" />
                       <span className="sr-only">Edit</span>
@@ -72,7 +88,7 @@ export function DevelopersTable({ developers, onEdit, onDelete }: DevelopersTabl
                       variant="ghost"
                       size="icon"
                       onClick={() => onDelete(dev)}
-                      className="h-8 w-8 text-red-600 hover:bg-red-50 hover:text-red-700"
+                      className="h-9 w-9 text-rose-600 hover:bg-rose-50 hover:text-rose-700 rounded-lg shadow-sm border border-transparent hover:border-rose-100"
                     >
                       <Trash2 className="h-4 w-4" />
                       <span className="sr-only">Delete</span>

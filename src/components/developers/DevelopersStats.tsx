@@ -44,16 +44,17 @@ export function DevelopersStats({ developers, isLoading }: DevelopersStatsProps)
   ];
 
   return (
-    <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
+    <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
       {stats.map((stat, i) => (
-        <div key={i} className="rounded-xl border bg-card p-6 shadow-sm transition-all hover:shadow-md">
-          <div className="flex items-center gap-4">
-            <div className={`p-3 rounded-lg ${stat.bgColor}`}>
-              <stat.icon className={`h-6 w-6 ${stat.color}`} />
+        <div key={i} className="group rounded-2xl border border-white/40 bg-white/60 backdrop-blur-md p-6 shadow-[0_8px_30px_rgb(0,0,0,0.04)] transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_8px_40px_rgb(0,0,0,0.08)] relative overflow-hidden">
+          <div className={`absolute -right-6 -top-6 h-24 w-24 rounded-full ${stat.bgColor} opacity-20 blur-2xl group-hover:scale-150 transition-transform duration-500`}></div>
+          <div className="flex items-center gap-5 relative z-10">
+            <div className={`flex h-14 w-14 shrink-0 items-center justify-center rounded-xl bg-gradient-to-br from-white to-white/50 shadow-sm ring-1 ring-black/5 ${stat.color}`}>
+              <stat.icon className="h-6 w-6" />
             </div>
             <div>
-              <p className="text-sm font-medium text-muted-foreground">{stat.title}</p>
-              <h3 className="text-2xl font-bold tracking-tight mt-1">{stat.value}</h3>
+              <p className="text-sm font-semibold text-slate-500 uppercase tracking-wider">{stat.title}</p>
+              <h3 className="text-3xl font-black text-slate-800 tracking-tight mt-1">{stat.value}</h3>
             </div>
           </div>
         </div>
