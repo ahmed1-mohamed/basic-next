@@ -24,7 +24,9 @@ export async function fetchDevelopers(params: FetchDevelopersParams): Promise<De
     });
 
     if (!response.ok) {
-      toast.error(`Failed to fetch developers: ${response.status}`);
+      const errBody = await response.json().catch(() => null);
+      const errorMessage = errBody?.message || errBody?.error || `Failed to fetch developers: ${response.status}`;
+      toast.error(errorMessage);
       raw = { data: [] };
     } else {
       raw = await response.json();
@@ -123,8 +125,10 @@ export async function fetchDeveloperById(id: string): Promise<Developer> {
     });
 
     if (!response.ok) {
-      toast.error(`Failed to fetch developer: ${response.status}`);
-      throw new Error(`Failed to fetch developer: ${response.status}`);
+      const errBody = await response.json().catch(() => null);
+      const errorMessage = errBody?.message || errBody?.error || `Failed to fetch developer: ${response.status}`;
+      toast.error(errorMessage);
+      throw new Error(errorMessage);
     } else {
       raw = await response.json();
     }
@@ -184,14 +188,13 @@ export async function createDeveloper(payload: CreateDeveloperPayload): Promise<
   });
 
   if (!response.ok) {
-    if (response.status === 422) {
-      const errBody = await response.json().catch(() => null);
-      if (errBody?.errors) {
-        throw { isValidationError: true, errors: errBody.errors };
-      }
+    const errBody = await response.json().catch(() => null);
+    if (response.status === 422 && errBody?.errors) {
+      throw { isValidationError: true, errors: errBody.errors };
     }
-    toast.error(`Failed to create developer: ${response.status}`);
-    throw new Error(`Failed to create developer: ${response.status} ${response.statusText}`);
+    const errorMessage = errBody?.message || errBody?.error || `Failed to create developer: ${response.status}`;
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
   }
 }
 
@@ -205,8 +208,10 @@ export async function deleteDeveloper(id: string | number): Promise<void> {
   });
 
   if (!response.ok) {
-    toast.error(`Failed to delete developer: ${response.status}`);
-    throw new Error(`Failed to delete developer: ${response.status} ${response.statusText}`);
+    const errBody = await response.json().catch(() => null);
+    const errorMessage = errBody?.message || errBody?.error || `Failed to delete developer: ${response.status}`;
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
   }
 }
 
@@ -232,14 +237,13 @@ export async function updateDeveloper(id: string | number, payload: Omit<UpdateD
   });
 
   if (!response.ok) {
-    if (response.status === 422) {
-      const errBody = await response.json().catch(() => null);
-      if (errBody?.errors) {
-        throw { isValidationError: true, errors: errBody.errors };
-      }
+    const errBody = await response.json().catch(() => null);
+    if (response.status === 422 && errBody?.errors) {
+      throw { isValidationError: true, errors: errBody.errors };
     }
-    toast.error(`Failed to update developer: ${response.status}`);
-    throw new Error(`Failed to update developer: ${response.status} ${response.statusText}`);
+    const errorMessage = errBody?.message || errBody?.error || `Failed to update developer: ${response.status}`;
+    toast.error(errorMessage);
+    throw new Error(errorMessage);
   }
 }
 

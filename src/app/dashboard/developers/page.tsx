@@ -9,6 +9,7 @@ import { useDevelopers } from "@/hooks/useDevelopers";
 import { DevelopersStats } from "@/components/developers/DevelopersStats";
 import { DevelopersFilters } from "@/components/developers/DevelopersFilters";
 import { DevelopersTable } from "@/components/developers/DevelopersTable";
+import { DevelopersPagination } from "@/components/developers/DevelopersPagination";
 import { EmptyState } from "@/components/developers/EmptyState";
 import { DeveloperFormDialog } from "@/components/developers/DeveloperFormDialog";
 import { DeleteDeveloperDialog } from "@/components/developers/DeleteDeveloperDialog";
@@ -17,6 +18,7 @@ import { Developer } from "@/types/developer";
 
 export default function DevelopersPage() {
   const [page, setPage] = useState(1);
+  const [perPage, setPerPage] = useState(10);
   const [search, setSearch] = useState("");
   const [status, setStatus] = useState("All");
 
@@ -26,7 +28,7 @@ export default function DevelopersPage() {
 
   const { data, isLoading, isError, error } = useDevelopers({
     page,
-    perPage: 10,
+    perPage,
     search,
     status,
   });
@@ -74,17 +76,17 @@ export default function DevelopersPage() {
       initial="hidden"
       animate="show"
       variants={containerVariants}
-      className="space-y-6 p-6 pb-16"
+      className="space-y-6 p-6 pb-16 max-w-7xl mx-auto"
     >
       <motion.div variants={itemVariants} className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
         <div>
-          <h1 className="text-3xl font-bold tracking-tight">Developers</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-3xl font-bold tracking-tight text-gray-900">Developers</h1>
+          <p className="text-muted-foreground mt-1 text-sm sm:text-base">
             Manage your developer team members and their account statuses.
           </p>
         </div>
         <div className="flex items-center gap-2">
-          <Button onClick={handleAdd} className="bg-[#0F7A6C] hover:bg-[#005F54] text-white">
+          <Button onClick={handleAdd} className="bg-[#0F7A6C] hover:bg-[#005F54] text-white shadow-md shadow-[#0F7A6C]/20 transition-all hover:-translate-y-0.5">
             <Plus className="mr-2 h-4 w-4" /> Add Developer
           </Button>
         </div>
@@ -132,33 +134,17 @@ export default function DevelopersPage() {
                     onDelete={handleDelete}
                   />
 
-                  <div className="flex items-center justify-between">
-                    <p className="text-sm text-muted-foreground">
-                      Showing <span className="font-medium">{(page - 1) * 10 + 1}</span> to{" "}
-                      <span className="font-medium">
-                        {Math.min(page * 10, data.meta?.total || 0)}
-                      </span>{" "}
-                      of <span className="font-medium">{data.meta?.total || 0}</span> developers
-                    </p>
-                    <div className="flex items-center gap-2">
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((p) => Math.max(1, p - 1))}
-                        disabled={page === 1}
-                      >
-                        Previous
-                      </Button>
-                      <Button
-                        variant="outline"
-                        size="sm"
-                        onClick={() => setPage((p) => p + 1)}
-                        disabled={page >= (data.meta?.totalPages || 1)}
-                      >
-                        Next
-                      </Button>
-                    </div>
-                  </div>
+                  <DevelopersPagination
+                    currentPage={page}
+                    totalPages={data.meta?.totalPages || 1}
+                    totalItems={data.meta?.total || 0}
+                    pageSize={perPage}
+                    onPageChange={setPage}
+                    onPageSizeChange={(size) => {
+                      setPerPage(size);
+                      setPage(1);
+                    }}
+                  />
                 </div>
               ) : (
                 <EmptyState
