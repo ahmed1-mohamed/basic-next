@@ -1,0 +1,14 @@
+{
+  "common": {
+    "welcome": "Welcome to our application",
+    "loading": "Loading...",
+    "error": "An error occurred",
+    "retry": "Retry",
+    "home": "Home",
+    "about": "About",
+    "settings": "Settings",
+    "language": "Language",
+    "english": "English",
+    "arabic": "العربية"
+  }
+}
